@@ -20,6 +20,21 @@ The first version is intentionally local-first and educational. It is designed t
 - Jest, Vitest, React Testing Library, Supertest and Playwright
 - GitHub Actions
 
+## Development
+
+Run all commands from the repository root. Corepack uses the pnpm version pinned in `package.json`.
+
+```bash
+corepack pnpm install
+corepack pnpm dev
+corepack pnpm build
+corepack pnpm typecheck
+corepack pnpm lint
+corepack pnpm test
+```
+
+The workspace contains `apps/web` and `apps/api`. Add shared development tools to the workspace root and application dependencies to the relevant package.
+
 ## Learning workflow
 
 Work is tracked in the **Webhook Center Learning Roadmap** GitHub Project.
@@ -38,4 +53,4 @@ Keep at most one learning task in progress at a time. Issues provide goals, rese
 
 ## Status
 
-The repository currently contains the learning roadmap only. Application implementation starts with Issue #1.
+The monorepo workspace is ready. The web and API applications have not been implemented yet.
