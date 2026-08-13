@@ -1,0 +1,40 @@
+.shell {
+  min-height: 100vh;
+}
+
+.header {
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #d7dce2;
+}
+
+.navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.link:focus-visible {
+  border-radius: 0.25rem;
+  outline: 2px solid currentColor;
+  outline-offset: 0.25rem;
+}
+
+.activeLink {
+  color: #646cff;
+}
+
+.main {
+  width: min(100% - 2rem, 70rem);
+  margin-inline: auto;
+  padding-block: 2rem;
+}
