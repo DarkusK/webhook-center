@@ -35,6 +35,33 @@ corepack pnpm test
 
 The workspace contains `apps/web` and `apps/api`. Add shared development tools to the workspace root and application dependencies to the relevant package.
 
+### API
+
+Copy `apps/api/.env.example` to `apps/api/.env` before starting the API. `PORT` is required and must contain a valid port number.
+
+Run API commands from the repository root:
+
+```bash
+corepack pnpm --filter @webhook-center/api dev
+corepack pnpm --filter @webhook-center/api build
+corepack pnpm --filter @webhook-center/api typecheck
+corepack pnpm --filter @webhook-center/api lint
+```
+
+Check the running API:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+Expected response:
+
+```json
+{
+  "status": "ok"
+}
+```
+
 ## Learning workflow
 
 Work is tracked in the **Webhook Center Learning Roadmap** GitHub Project.
@@ -53,4 +80,4 @@ Keep at most one learning task in progress at a time. Issues provide goals, rese
 
 ## Status
 
-The monorepo workspace is ready. The web and API applications have not been implemented yet.
+The monorepo includes a React application shell and a NestJS API with a health endpoint.
