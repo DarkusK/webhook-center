@@ -62,6 +62,43 @@ Expected response:
 }
 ```
 
+### Database
+
+Copy the root `.env.example` to `.env` and replace the example values with local development values. The root `.env` configures PostgreSQL in Docker and is ignored by Git.
+
+Start PostgreSQL and check its status:
+
+```bash
+docker compose up -d
+docker compose ps
+```
+
+Follow the database logs:
+
+```bash
+docker compose logs -f postgres
+```
+
+Stop the database without deleting its data:
+
+```bash
+docker compose down
+```
+
+The local connection URL has this format:
+
+```text
+postgresql://<POSTGRES_USER>:<POSTGRES_PASSWORD>@localhost:<POSTGRES_PORT>/<POSTGRES_DB>
+```
+
+To reset the development database completely, remove the containers and the project database volume:
+
+```bash
+docker compose down -v
+```
+
+This reset permanently deletes the data stored in the `webhook_postgres_data` volume. It does not remove unrelated Docker volumes.
+
 ## Learning workflow
 
 Work is tracked in the **Webhook Center Learning Roadmap** GitHub Project.
