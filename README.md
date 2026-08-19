@@ -35,6 +35,35 @@ corepack pnpm test
 
 The workspace contains `apps/web` and `apps/api`. Add shared development tools to the workspace root and application dependencies to the relevant package.
 
+### Quality checks
+
+GitHub Actions runs the same quality checks for every pull request and for pushes to `main`. Run the commands from the repository root to reproduce CI locally.
+
+Install the exact dependencies from the lockfile:
+
+```bash
+corepack pnpm install --frozen-lockfile
+```
+
+Run each CI check:
+
+```bash
+corepack pnpm format:check
+corepack pnpm lint
+corepack pnpm typecheck
+corepack pnpm test
+corepack pnpm build
+```
+
+To fix formatting and automatically fixable lint problems during development, run:
+
+```bash
+corepack pnpm format
+corepack pnpm lint:fix
+```
+
+CI uses only the non-mutating check commands and never runs the fix commands.
+
 ### API
 
 Copy `apps/api/.env.example` to `apps/api/.env` before starting the API. `PORT` is required and must contain a valid port number.
