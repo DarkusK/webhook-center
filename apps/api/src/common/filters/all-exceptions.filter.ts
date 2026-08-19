@@ -15,13 +15,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost
     const context = host.switchToHttp()
     const statusCode =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR
-    const message =
-      exception instanceof HttpException
-        ? exception.message
-        : 'Internal server error'
+      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR
+    const message = exception instanceof HttpException ? exception.message : 'Internal server error'
     const request = context.getRequest()
     const responseBody = {
       statusCode,
