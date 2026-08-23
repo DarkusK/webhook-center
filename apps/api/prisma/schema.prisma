@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ReplayStatus {
+  PENDING       @map("pending")
+  SUCCEEDED     @map("succeeded")
+  HTTP_ERROR    @map("http_error")
+  TIMEOUT       @map("timeout")
+  NETWORK_ERROR @map("network_error")
+}
+
+model User {
+  id           Int               @id @default(autoincrement())
+  email        String            @unique
+  passwordHash String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  sessions     Session[]
+  endpoints    WebhookEndpoint[]
+}
+
+model Session {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  tokenHash String    @unique
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model WebhookEndpoint {
+  id           Int            @id @default(autoincrement())
+  userId       Int
+  name         String
+  captureToken String         @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events       WebhookEvent[]
+}
+
+model WebhookEvent {
+  id             Int             @id @default(autoincrement())
+  endpointId     Int
+  method         String
+  path           String
+  rawQuery       String          @default("")
+  headers        Json
+  rawBody        Bytes
+  bodySizeBytes  Int
+  receivedAt     DateTime        @default(now())
+  endpoint       WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  replayAttempts ReplayAttempt[]
+}
+
+model ReplayAttempt {
+  id                Int          @id @default(autoincrement())
+  eventId           Int
+  targetUrl         String
+  status            ReplayStatus @default(PENDING)
+  startedAt         DateTime     @default(now())
+  responseTruncated Boolean      @default(false)
+  completedAt       DateTime?
+  httpStatusCode    Int?
+  responseBody      Bytes?
+  durationMs        Int?
+  errorMessage      String?
+  event             WebhookEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}

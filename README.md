@@ -66,7 +66,7 @@ CI uses only the non-mutating check commands and never runs the fix commands.
 
 ### API
 
-Copy `apps/api/.env.example` to `apps/api/.env` before starting the API. `PORT` is required and must contain a valid port number.
+Copy `apps/api/.env.example` to `apps/api/.env`. `PORT` configures the API, and `DATABASE_URL` must match the local Docker database settings.
 
 Run API commands from the repository root:
 
@@ -118,6 +118,14 @@ The local connection URL has this format:
 
 ```text
 postgresql://<POSTGRES_USER>:<POSTGRES_PASSWORD>@localhost:<POSTGRES_PORT>/<POSTGRES_DB>
+```
+
+Run Prisma commands from the repository root:
+
+```bash
+corepack pnpm --filter @webhook-center/api prisma:generate
+corepack pnpm --filter @webhook-center/api prisma:migrate -- --name <migration-name>
+corepack pnpm --filter @webhook-center/api prisma:studio
 ```
 
 To reset the development database completely, remove the containers and the project database volume:
