@@ -7,7 +7,7 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['**/dist/**', '**/coverage/**']),
+  globalIgnores(['**/dist/**', '**/coverage/**', '**/src/generated/prisma/**']),
   eslint.configs.recommended,
   ...typescriptEslint.configs.recommended,
   {
