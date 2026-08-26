@@ -5,6 +5,7 @@ import Joi from 'joi'
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js'
 import { HealthModule } from './health/health.module.js'
 import { PrismaModule } from './prisma/prisma.module.js'
+import { AuthModule } from './auth/auth.module.js'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PrismaModule } from './prisma/prisma.module.js'
     }),
     HealthModule,
     PrismaModule,
+    AuthModule,
   ],
   providers: [
     {
