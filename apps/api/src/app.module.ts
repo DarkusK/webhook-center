@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module.js'
       validationSchema: Joi.object({
         PORT: Joi.number().port().required(),
         DATABASE_URL: Joi.string().uri().required(),
+        WEB_ORIGIN: Joi.string().uri().required(),
       }),
     }),
     HealthModule,
