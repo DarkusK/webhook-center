@@ -4,12 +4,11 @@
 
 .header {
   padding: 1rem 2rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--text) 24%, transparent);
+  border-bottom: 1px solid #d7dce2;
 }
 
 .navigation {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -34,67 +33,6 @@
   color: #646cff;
 }
 
-.navigation > span {
-  overflow-wrap: anywhere;
-  color: var(--text-h);
-  font-size: 0.9rem;
-}
-
-.navigation p {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.navigation p[role='alert'] {
-  color: #c33434;
-}
-
-.navigation button {
-  margin-left: auto;
-  padding: 0.4rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--text) 38%, transparent);
-  border-radius: 0.45rem;
-  color: var(--text-h);
-  background: transparent;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.navigation button:hover:not(:disabled) {
-  border-color: #646cff;
-  color: #646cff;
-}
-
-.navigation button:focus-visible {
-  outline: 2px solid #646cff;
-  outline-offset: 0.2rem;
-}
-
-.navigation button:disabled {
-  cursor: wait;
-  opacity: 0.6;
-}
-
-@media (max-width: 640px) {
-  .header {
-    padding-inline: 1rem;
-  }
-
-  .navigation button {
-    margin-left: 0;
-  }
-
-  .navigation > span {
-    width: 100%;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .navigation p[role='alert'] {
-    color: #ff9b9b;
-  }
-}
 .main {
   width: min(100% - 2rem, 70rem);
   margin-inline: auto;
