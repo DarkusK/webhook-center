@@ -1,22 +1,61 @@
-import { NavLink, Outlet } from 'react-router'
+import { NavLink, Outlet, useNavigate } from 'react-router'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useCurrentUser, currentUserQueryKey } from '../features/auth/use-current-user.js'
 import styles from './AppLayout.module.css'
+import { logout as logoutUser } from '../features/auth/auth.api.js'
+
 function AppLayout() {
   const getLinkClassName = ({ isActive }: { isActive: boolean }) =>
     `${styles.link} ${isActive ? styles.activeLink : ''}`
-
+  const { data: user, isPending, isError } = useCurrentUser()
+  const queryClient = useQueryClient()
+  const navigation = useNavigate()
+  const logoutMutation = useMutation({
+    mutationFn: logoutUser,
+    onSuccess: () => {
+      queryClient.setQueryData(currentUserQueryKey, null)
+      navigation('/', { replace: true })
+    },
+  })
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
         <nav className={styles.navigation} aria-label="Main navigation">
+          {isPending && <p role="status">Loading session...</p>}
+          {isError && <p role="alert">Unable to load session</p>}
           <NavLink className={getLinkClassName} to="/" end>
             Home
           </NavLink>
-          <NavLink className={getLinkClassName} to="/endpoints">
-            Endpoints
-          </NavLink>
-          <NavLink className={getLinkClassName} to="/events">
-            Events
-          </NavLink>
+          {!isPending &&
+            !isError &&
+            (user ? (
+              <>
+                <NavLink className={getLinkClassName} to="/endpoints">
+                  Endpoints
+                </NavLink>
+                <NavLink className={getLinkClassName} to="/events">
+                  Events
+                </NavLink>
+                {logoutMutation.isError && <p role="alert">{logoutMutation.error.message}</p>}
+                <button
+                  type="button"
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending}
+                >
+                  {logoutMutation.isPending ? 'Signing out...' : 'Sign out'}
+                </button>
+                <span>{user.email}</span>
+              </>
+            ) : (
+              <>
+                <NavLink className={getLinkClassName} to="/login">
+                  Sign in
+                </NavLink>
+                <NavLink className={getLinkClassName} to="/register">
+                  Create account
+                </NavLink>
+              </>
+            ))}
         </nav>
       </header>
       <main className={styles.main}>
