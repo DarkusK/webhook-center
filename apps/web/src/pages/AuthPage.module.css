@@ -1,0 +1,132 @@
+.page {
+  width: min(100%, 29rem);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--text) 24%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--bg) 94%, var(--text-h) 6%);
+  box-shadow: 0 1.25rem 3rem color-mix(in srgb, var(--text-h) 10%, transparent);
+}
+
+.page h1 {
+  margin-block: 0 0.5rem;
+  font-size: clamp(2rem, 8vw, 3rem);
+}
+
+.switchLink {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #646cff;
+  font-weight: 600;
+}
+
+.switchLink:focus-visible,
+.submitButton:focus-visible,
+.form input:focus-visible {
+  outline: 3px solid color-mix(in srgb, #646cff 55%, transparent);
+  outline-offset: 3px;
+}
+
+.form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.form label {
+  margin-top: 0.55rem;
+  color: var(--text-h);
+  font-weight: 650;
+}
+
+.form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--text) 42%, transparent);
+  border-radius: 0.55rem;
+  color: var(--text-h);
+  background: var(--bg);
+  font: inherit;
+}
+
+.form input:hover {
+  border-color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.form input[aria-invalid='true'] {
+  border-color: #d14343;
+}
+
+.fieldError {
+  color: #c33434;
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.serverError,
+.successMessage {
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.55rem;
+  font-size: 0.925rem;
+}
+
+.serverError {
+  border: 1px solid #e59b9b;
+  color: #8f2323;
+  background: #fff0f0;
+}
+
+.successMessage {
+  margin-block: 0 1rem;
+  border: 1px solid #7bb894;
+  color: #175f36;
+  background: #edf9f1;
+}
+
+.submitButton {
+  min-height: 2.85rem;
+  margin-top: 1rem;
+  padding-inline: 1rem;
+  border: 0;
+  border-radius: 0.55rem;
+  color: #fff;
+  background: #646cff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #535bf2;
+}
+
+.submitButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+@media (prefers-color-scheme: dark) {
+  .fieldError {
+    color: #ff9b9b;
+  }
+
+  .serverError {
+    border-color: #914949;
+    color: #ffc1c1;
+    background: #341d22;
+  }
+
+  .successMessage {
+    border-color: #40795a;
+    color: #b8f0cc;
+    background: #173124;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+  }
+}
