@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module.js'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: process.env['NODE_ENV'] === 'test' ? '.env.test' : '.env',
       validationSchema: Joi.object({
         PORT: Joi.number().port().required(),
         DATABASE_URL: Joi.string().uri().required(),
