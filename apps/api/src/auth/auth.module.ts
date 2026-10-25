@@ -9,5 +9,6 @@ import { SameOriginGuard } from './same-origin.guard.js'
   controllers: [AuthController],
   providers: [AuthService, SessionAuthGuard, SameOriginGuard],
   imports: [PrismaModule],
+  exports: [SessionAuthGuard, SameOriginGuard, AuthService],
 })
 export class AuthModule {}

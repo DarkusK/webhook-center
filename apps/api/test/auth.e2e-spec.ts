@@ -6,23 +6,23 @@ import { PrismaService } from '../src/prisma/prisma.service.js'
 import request from 'supertest'
 import { ConfigService } from '@nestjs/config'
 
+const TEST_EMAIL = 'user@example.com'
+const TEST_PASSWORD = 'passwordHuy12345678'
+const INVALID_PASSWORD = 'HuevyPassword1234567'
+
 describe('Authentication integration', () => {
   let app: INestApplication
   let prisma: PrismaService
-  let configService: ConfigService
+  let webOrigin: string
 
-  async function registerUser(email: string, password: string) {
-    const http = app.getHttpServer()
-    const webOrigin = configService.getOrThrow<string>('WEB_ORIGIN')
-    return request(http)
+  async function registerUser(email = TEST_EMAIL, password = TEST_PASSWORD) {
+    return request(app.getHttpServer())
       .post('/api/auth/register')
       .set('Origin', webOrigin)
       .send({ email, password })
   }
-  async function loginUser(email: string, password: string) {
-    const http = app.getHttpServer()
-    const webOrigin = configService.getOrThrow<string>('WEB_ORIGIN')
-    const agent = request.agent(http)
+  async function loginUser(email = TEST_EMAIL, password = TEST_PASSWORD) {
+    const agent = request.agent(app.getHttpServer())
     const response = await agent
       .post('/api/auth/login')
       .set('Origin', webOrigin)
@@ -32,6 +32,17 @@ describe('Authentication integration', () => {
       response,
     }
   }
+  async function registerValidUser(email = TEST_EMAIL, password = TEST_PASSWORD) {
+    const response = await registerUser(email, password)
+    expect(response.status).toBe(201)
+    return response
+  }
+  async function createAuthenticatedSession(email = TEST_EMAIL, password = TEST_PASSWORD) {
+    await registerValidUser(email, password)
+    const result = await loginUser(email, password)
+    expect(result.response.status).toBe(201)
+    return result
+  }
   // Выполнится один раз перед всеми тестами в блоке
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
@@ -39,7 +50,8 @@ describe('Authentication integration', () => {
     }).compile()
     prisma = moduleFixture.get(PrismaService)
     app = moduleFixture.createNestApplication()
-    configService = moduleFixture.get(ConfigService)
+    const configService = moduleFixture.get(ConfigService)
+    webOrigin = configService.getOrThrow<string>('WEB_ORIGIN')
     const databaseUrl = configService.getOrThrow<string>('DATABASE_URL')
     const parsedUrl = new URL(databaseUrl)
 
@@ -61,22 +73,20 @@ describe('Authentication integration', () => {
     expect(response.body.path).toBe('/api/auth/me')
   })
   it('registers a valid user', async () => {
-    const password = 'passwordHuy12345678'
-
-    const response = await registerUser('user@example.com', password)
+    const response = await registerUser()
     expect(response.status).toBe(201)
     expect(response.body).toEqual({
       id: expect.any(Number),
-      email: 'user@example.com',
+      email: TEST_EMAIL,
       createdAt: expect.any(String),
     })
     const user = await prisma.user.findUnique({
       where: {
-        email: 'user@example.com',
+        email: TEST_EMAIL,
       },
     })
     expect(user).not.toBeNull()
-    expect(user?.passwordHash).not.toBe(password)
+    expect(user?.passwordHash).not.toBe(TEST_PASSWORD)
   })
 
   it('rejects invalid registration data', async () => {
@@ -86,12 +96,9 @@ describe('Authentication integration', () => {
     expect(userCount).toBe(0)
   })
 
-  it('rejects duplicate registration ', async () => {
-    const password = 'passwordHuy12345678'
-    const responseOne = await registerUser('user@example.com', password)
-
-    expect(responseOne.status).toBe(201)
-    const responseTwo = await registerUser('user@example.com', password)
+  it('rejects duplicate registration', async () => {
+    await registerValidUser()
+    const responseTwo = await registerUser()
 
     expect(responseTwo.status).toBe(409)
     expect(responseTwo.body.message).toBe('An account with this email already exists. Sign in.')
@@ -99,12 +106,10 @@ describe('Authentication integration', () => {
     expect(userCount).toBe(1)
   })
 
-  it('logs in a valid user and sets a session cookie ', async () => {
-    const password = 'passwordHuy12345678'
-    const response = await registerUser('user@example.com', password)
-    expect(response.status).toBe(201)
+  it('logs in a valid user and sets a session cookie', async () => {
+    await registerValidUser()
 
-    const { agent, response: loginResponse } = await loginUser('user@example.com', password)
+    const { agent, response: loginResponse } = await loginUser()
 
     expect(loginResponse.status).toBe(201)
     const setCookieHeader = loginResponse.headers['set-cookie']
@@ -123,32 +128,27 @@ describe('Authentication integration', () => {
   })
 
   it('rejects login with an invalid password', async () => {
-    const response = await registerUser('user@example.com', 'passwordHuy12345678')
+    await registerValidUser()
 
-    expect(response.status).toBe(201)
-
-    const { response: loginResponse } = await loginUser('user@example.com', 'HuevyPassword1234567')
+    const { response: loginResponse } = await loginUser(TEST_EMAIL, INVALID_PASSWORD)
     expect(loginResponse.status).toBe(401)
     expect(loginResponse.body.message).toBe('Invalid email or password')
     expect(loginResponse.headers['set-cookie']).toBeUndefined()
     const sessionCount = await prisma.session.count()
     expect(sessionCount).toBe(0)
   })
-  it('rejects login for an unknown email ', async () => {
-    const { response: loginResponse } = await loginUser('ne@ebu.com', 'passwordHuy12345678')
+
+  it('rejects login for an unknown email', async () => {
+    const { response: loginResponse } = await loginUser('missing@example.com')
     expect(loginResponse.status).toBe(401)
     expect(loginResponse.body.message).toBe('Invalid email or password')
     expect(loginResponse.headers['set-cookie']).toBeUndefined()
     const sessionCount = await prisma.session.count()
     expect(sessionCount).toBe(0)
   })
-  it('logs out an authenticated user ', async () => {
-    const webOrigin = configService.getOrThrow<string>('WEB_ORIGIN')
-    const password = 'passwordHuy12345678'
-    const regResponse = await registerUser('user@example.com', password)
-    expect(regResponse.status).toBe(201)
 
-    const { agent } = await loginUser('user@example.com', password)
+  it('logs out an authenticated user', async () => {
+    const { agent } = await createAuthenticatedSession()
 
     const delResponse = await agent.delete('/api/auth/session').set('Origin', webOrigin)
 
@@ -161,11 +161,9 @@ describe('Authentication integration', () => {
     const meResponse = await agent.get('/api/auth/me')
     expect(meResponse.status).toBe(401)
   })
-  it('rejects an expired session ', async () => {
-    const password = 'passwordHuy12345678'
-    const regResponse = await registerUser('user@example.com', password)
-    expect(regResponse.status).toBe(201)
-    const { agent } = await loginUser('user@example.com', password)
+
+  it('rejects an expired session', async () => {
+    const { agent } = await createAuthenticatedSession()
     const updateResult = await prisma.session.updateMany({
       data: {
         createdAt: new Date(Date.now() - 120_000),
@@ -177,22 +175,19 @@ describe('Authentication integration', () => {
     expect(meResponse.status).toBe(401)
     expect(meResponse.body.message).toBe('Unauthorized')
   })
-  it('keeps user sessions isolated', async () => {
-    const regResponseOne = await registerUser('first@example.com', 'passwordHuy12345678')
-    expect(regResponseOne.status).toBe(201)
-    const regResponseTwo = await registerUser('second@example.com', '123passwordHuy12345678')
-    expect(regResponseTwo.status).toBe(201)
 
-    const { agent: firstAgent } = await loginUser('first@example.com', 'passwordHuy12345678')
+  it('keeps user sessions isolated', async () => {
+    const { agent: firstAgent } = await createAuthenticatedSession('first@example.com')
     const firstMeResponse = await firstAgent.get('/api/auth/me')
     expect(firstMeResponse.status).toBe(200)
-    const { agent: secondAgent } = await loginUser('second@example.com', '123passwordHuy12345678')
+    const { agent: secondAgent } = await createAuthenticatedSession('second@example.com')
     const secondMeResponse = await secondAgent.get('/api/auth/me')
     expect(secondMeResponse.status).toBe(200)
     expect(firstMeResponse.body.email).toBe('first@example.com')
     expect(secondMeResponse.body.email).toBe('second@example.com')
     expect(firstMeResponse.body.id).not.toBe(secondMeResponse.body.id)
   })
+
   // Выполнится один раз после всех тестов в блоке
   afterAll(async () => {
     await app.close()

@@ -6,6 +6,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js'
 import { HealthModule } from './health/health.module.js'
 import { PrismaModule } from './prisma/prisma.module.js'
 import { AuthModule } from './auth/auth.module.js'
+import { EndpointsModule } from './endpoints/endpoints.module.js'
 
 @Module({
   imports: [
@@ -16,11 +17,13 @@ import { AuthModule } from './auth/auth.module.js'
         PORT: Joi.number().port().required(),
         DATABASE_URL: Joi.string().uri().required(),
         WEB_ORIGIN: Joi.string().uri().required(),
+        PUBLIC_BASE_URL: Joi.string().uri().required(),
       }),
     }),
     HealthModule,
     PrismaModule,
     AuthModule,
+    EndpointsModule,
   ],
   providers: [
     {
