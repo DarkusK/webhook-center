@@ -1,5 +1,6 @@
 import type { AuthFormValues, PublicUser } from './auth.types.js'
 import { ApiError } from '../../lib/api-error.js'
+import { readErrorMessage } from '../../lib/read-error-message.js'
 
 export async function getCurrentUser(): Promise<PublicUser | null> {
   const response = await fetch('/api/auth/me', { credentials: 'same-origin' })
@@ -57,19 +58,5 @@ export async function logout(): Promise<void> {
   if (!response.ok) {
     const errorMessage = await readErrorMessage(response, 'Unable to log out.')
     throw new ApiError(response.status, errorMessage)
-  }
-}
-async function readErrorMessage(response: Response, fallback: string): Promise<string> {
-  try {
-    const data = await response.json()
-    if (Array.isArray(data.message)) {
-      return data.message.join(',')
-    }
-    if (typeof data.message === 'string') {
-      return data.message
-    }
-    return fallback
-  } catch {
-    return fallback
   }
 }

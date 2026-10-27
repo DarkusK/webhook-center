@@ -21,6 +21,9 @@ function AppLayout() {
     <div className={styles.shell}>
       <header className={styles.header}>
         <nav className={styles.navigation} aria-label="Main navigation">
+          <NavLink className={styles.brand} to="/" end>
+            Webhook Center
+          </NavLink>
           {isPending && <p role="status">Loading session...</p>}
           {isError && <p role="alert">Unable to load session</p>}
           <NavLink className={getLinkClassName} to="/" end>
@@ -36,25 +39,28 @@ function AppLayout() {
                 <NavLink className={getLinkClassName} to="/events">
                   Events
                 </NavLink>
-                {logoutMutation.isError && <p role="alert">{logoutMutation.error.message}</p>}
-                <button
-                  type="button"
-                  onClick={() => logoutMutation.mutate()}
-                  disabled={logoutMutation.isPending}
-                >
-                  {logoutMutation.isPending ? 'Signing out...' : 'Sign out'}
-                </button>
-                <span>{user.email}</span>
+                <div className={styles.account}>
+                  {logoutMutation.isError && <p role="alert">{logoutMutation.error.message}</p>}
+                  <span className={styles.userEmail}>{user.email}</span>
+                  <button
+                    className={styles.logoutButton}
+                    type="button"
+                    onClick={() => logoutMutation.mutate()}
+                    disabled={logoutMutation.isPending}
+                  >
+                    {logoutMutation.isPending ? 'Signing out...' : 'Sign out'}
+                  </button>
+                </div>
               </>
             ) : (
-              <>
+              <div className={styles.account}>
                 <NavLink className={getLinkClassName} to="/login">
                   Sign in
                 </NavLink>
                 <NavLink className={getLinkClassName} to="/register">
                   Create account
                 </NavLink>
-              </>
+              </div>
             ))}
         </nav>
       </header>
