@@ -91,6 +91,30 @@ Expected response:
 }
 ```
 
+#### Public webhook capture
+
+Send webhook requests to the public URL below, replacing `<capture-token>` with an endpoint's capture token:
+
+```text
+http://localhost:3000/hooks/<capture-token>
+```
+
+The capture route does not use the `/api` prefix and does not require authentication. It accepts `GET`, `POST`, `PUT`, `PATCH` and `DELETE` requests.
+
+A successfully accepted request returns `200 OK`:
+
+```json
+{
+  "received": true
+}
+```
+
+The route returns:
+
+- `404 Not Found` when the token is unknown or its endpoint was deleted;
+- `405 Method Not Allowed` with an `Allow` header for unsupported methods;
+- `413 Payload Too Large` when the request body exceeds `1 MiB`.
+
 ### Database
 
 Copy the root `.env.example` to `.env` and replace the example values with local development values. The root `.env` configures PostgreSQL in Docker and is ignored by Git.

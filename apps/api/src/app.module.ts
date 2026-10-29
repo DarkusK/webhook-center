@@ -7,6 +7,7 @@ import { HealthModule } from './health/health.module.js'
 import { PrismaModule } from './prisma/prisma.module.js'
 import { AuthModule } from './auth/auth.module.js'
 import { EndpointsModule } from './endpoints/endpoints.module.js'
+import { CaptureModule } from './capture/capture.module.js'
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { EndpointsModule } from './endpoints/endpoints.module.js'
     PrismaModule,
     AuthModule,
     EndpointsModule,
+    CaptureModule,
   ],
   providers: [
     {

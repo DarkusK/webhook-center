@@ -28,6 +28,18 @@ function getHttpExceptionMessage(exception: HttpException): string | string[] {
 
   return exception.message
 }
+
+function isPayloadTooLargeError(exception: unknown): boolean {
+  return (
+    typeof exception === 'object' &&
+    exception !== null &&
+    'status' in exception &&
+    exception.status === HttpStatus.PAYLOAD_TOO_LARGE &&
+    'type' in exception &&
+    exception.type === 'entity.too.large'
+  )
+}
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
@@ -35,12 +47,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost
     const context = host.switchToHttp()
+    const payloadTooLarge = isPayloadTooLargeError(exception)
     const statusCode =
-      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : payloadTooLarge
+          ? HttpStatus.PAYLOAD_TOO_LARGE
+          : HttpStatus.INTERNAL_SERVER_ERROR
     const message =
       exception instanceof HttpException
         ? getHttpExceptionMessage(exception)
-        : 'Internal server error'
+        : payloadTooLarge
+          ? 'Payload too large'
+          : 'Internal server error'
     const request = context.getRequest()
     const responseBody = {
       statusCode,
