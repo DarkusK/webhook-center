@@ -1,10 +1,10 @@
-import type { INestApplication } from '@nestjs/common'
 import { PrismaService } from '../src/prisma/prisma.service.js'
 import { ConfigService } from '@nestjs/config'
 import { Test } from '@nestjs/testing'
 import { AppModule } from '../src/app.module.js'
 import { configureApp } from '../src/configure-app.js'
 import request from 'supertest'
+import type { NestExpressApplication } from '@nestjs/platform-express'
 
 const TEST_PASSWORD = 'testPassword12345'
 
@@ -19,7 +19,7 @@ interface EndpointResponse {
 type TestAgent = ReturnType<typeof request.agent>
 
 describe('Endpoint integration', () => {
-  let app: INestApplication
+  let app: NestExpressApplication
   let prisma: PrismaService
   let webOrigin: string
   let publicBaseUrl: string

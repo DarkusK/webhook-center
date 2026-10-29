@@ -1,12 +1,26 @@
 import { ConfigService } from '@nestjs/config'
 import cookieParser from 'cookie-parser'
-import { type INestApplication, ValidationPipe } from '@nestjs/common'
-
-export function configureApp(app: INestApplication): void {
+import { RequestMethod, ValidationPipe } from '@nestjs/common'
+import type { NestExpressApplication } from '@nestjs/platform-express'
+const BODY_LIMIT = '1mb'
+export function configureApp(app: NestExpressApplication): void {
   const configService = app.get(ConfigService)
 
   const webOrigin = configService.getOrThrow<string>('WEB_ORIGIN')
-  app.setGlobalPrefix('api')
+  app.setGlobalPrefix('api', {
+    exclude: [{ path: 'hooks/:token', method: RequestMethod.ALL }],
+  })
+  app.useBodyParser('json', {
+    limit: BODY_LIMIT,
+  })
+  app.useBodyParser('urlencoded', {
+    limit: BODY_LIMIT,
+    extended: true,
+  })
+  app.useBodyParser('raw', {
+    limit: BODY_LIMIT,
+    type: '*/*',
+  })
   app.use(cookieParser())
   app.useGlobalPipes(
     new ValidationPipe({

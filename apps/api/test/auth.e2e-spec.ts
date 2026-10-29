@@ -1,17 +1,17 @@
-import { type INestApplication } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { AppModule } from '../src/app.module.js'
 import { configureApp } from '../src/configure-app.js'
 import { PrismaService } from '../src/prisma/prisma.service.js'
 import request from 'supertest'
 import { ConfigService } from '@nestjs/config'
+import type { NestExpressApplication } from '@nestjs/platform-express'
 
 const TEST_EMAIL = 'user@example.com'
 const TEST_PASSWORD = 'passwordHuy12345678'
 const INVALID_PASSWORD = 'HuevyPassword1234567'
 
 describe('Authentication integration', () => {
-  let app: INestApplication
+  let app: NestExpressApplication
   let prisma: PrismaService
   let webOrigin: string
 
